@@ -103,5 +103,34 @@ describe "Merchant API" do
         end
       end
     end
+
+    describe "Business Intelligence" do
+      describe "Multi" do
+        it "most_revenue" do
+          invoice_1 = create(:invoice)
+          invoice_2 = create(:invoice, items_count: 20)
+
+          get "/api/v1/merchants/most_revenue?quantity=1"
+
+          res = JSON.parse(response.body)["data"]
+
+          expect(res.first["id"].to_i).to eq(invoice_2.merchant.id)
+        end
+      end
+
+      describe "Single" do
+        it "revenue" do
+          merchant = create(:merchant)
+          create(:invoice, merchant: merchant, items_count: 1)
+
+          get "/api/v1/merchants/#{merchant.id}/revenue"
+
+          res = JSON.parse(response.body)["data"]
+
+          expect(res["id"].to_i).to eq(merchant.id)
+          expect(res["attributes"]["revenue"].to_i).to eq(50)
+        end
+      end
+    end
   end
 end

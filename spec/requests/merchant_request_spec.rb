@@ -127,8 +127,21 @@ describe "Merchant API" do
 
           res = JSON.parse(response.body)["data"]
 
-          expect(res["id"].to_i).to eq(merchant.id)
-          expect(res["attributes"]["revenue"].to_i).to eq(50)
+          expect(res["revenue"].to_i).to eq(50)
+        end
+
+        it "revenue by date" do
+          date = "2012-03-16"
+
+          merchant = create(:merchant)
+          create(:invoice, merchant: merchant, items_count: 1, created_at: date)
+          create(:invoice, merchant: merchant, items_count: 1, created_at: 1.day.ago)
+
+          get "/api/v1/merchants/#{merchant.id}/revenue?date=#{date}"
+
+          res = JSON.parse(response.body)["data"]
+
+          expect(res["revenue"].to_i).to eq(50)
         end
       end
     end

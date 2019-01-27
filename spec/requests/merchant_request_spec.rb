@@ -110,23 +110,25 @@ describe "Merchant API" do
           invoice_1 = create(:invoice)
           invoice_2 = create(:invoice, items_count: 20)
 
-          get "/api/v1/merchants/most_revenue?quantity=1"
-
-          res = JSON.parse(response.body)["data"]
-
-          expect(res.first["id"].to_i).to eq(invoice_2.merchant.id)
-        end
-
-        it "most_revenue quantity" do
-          invoice_1 = create(:invoice)
-          invoice_2 = create(:invoice, items_count: 20)
-
           get "/api/v1/merchants/most_revenue?quantity=2"
 
           res = JSON.parse(response.body)["data"]
 
           expect(res.first["id"].to_i).to eq(invoice_2.merchant.id)
           expect(res.second["id"].to_i).to eq(invoice_1.merchant.id)
+        end
+
+        it "most_items" do
+          invoice_1 = create(:invoice)
+          invoice_2 = create(:invoice, items_count: 2)
+
+          get "/api/v1/merchants/most_items?quantity=2"
+
+          res = JSON.parse(response.body)["data"]
+
+          expect(res.length).to eq(2)
+          expect(res.first["id"].to_i).to eq(invoice_1.merchant.id)
+          expect(res.second["id"].to_i).to eq(invoice_2.merchant.id)
         end
       end
 
@@ -153,7 +155,7 @@ describe "Merchant API" do
           get "/api/v1/merchants/#{merchant.id}/revenue?date=#{date}"
 
           res = JSON.parse(response.body)["data"]
-          require 'pry'; binding.pry
+
           expect(res["attributes"]["revenue"]).to eq("0.5")
         end
 

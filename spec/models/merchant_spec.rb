@@ -7,10 +7,17 @@ RSpec.describe Merchant, type: :model do
 
   describe "Class Methods" do
     it ".most_revenue" do
-      create(:invoice)
+      invoice_1 = create(:invoice)
       invoice_2 = create(:invoice, items_count: 20)
 
-      expect(Merchant.most_revenue(1)).to eq([invoice_2.merchant])
+      expect(Merchant.most_revenue(2)).to eq([invoice_2.merchant, invoice_1.merchant])
+    end
+
+    it ".most_items" do
+      invoice_1 = create(:invoice)
+      invoice_2 = create(:invoice, items_count: 20)
+
+      expect(Merchant.most_items(2)).to eq([invoice_2.merchant, invoice_1.merchant])
     end
   end
 

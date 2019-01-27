@@ -1,3 +1,5 @@
+require 'time'
+
 class Merchant < ApplicationRecord
   validates_presence_of :name
   has_many :items
@@ -13,9 +15,17 @@ class Merchant < ApplicationRecord
     .limit(quantity)
   end
 
-  def revenue
-    Item.joins(:invoice_items)
+  def revenue(raw_date = nil)
+    result = Item.joins(:invoice_items, invoices: :transactions)
+    .where(transactions: {result: "success"})
     .where(merchant_id: self)
-    .sum('invoice_items.quantity * invoice_items.unit_price')
+
+
+    if raw_date
+      date = DateTime.parse(raw_date)
+      result.where(invoices: {created_at: date..date.at_end_of_day})
+    else
+      result
+    end.sum('invoice_items.quantity * invoice_items.unit_price')
   end
 end

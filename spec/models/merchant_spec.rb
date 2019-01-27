@@ -21,5 +21,15 @@ RSpec.describe Merchant, type: :model do
 
       expect(merchant.revenue(date)).to eq(50)
     end
+
+    it "#favorite_customer" do
+      merchant = create(:merchant)
+      customer = create(:customer)
+      create(:invoice, merchant: merchant, items_count: 1)
+      invoice_2 = create(:invoice, customer: customer, merchant: merchant, items_count: 2)
+      invoice_2 = create(:invoice, customer: customer, merchant: merchant, items_count: 2)
+
+      expect(merchant.favorite_customer).to eq(invoice_2.customer)
+    end
   end
 end

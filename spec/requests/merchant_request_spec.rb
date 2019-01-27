@@ -140,7 +140,7 @@ describe "Merchant API" do
 
           res = JSON.parse(response.body)["data"]
 
-          expect(res["revenue"].to_i).to eq(50)
+          expect(res["attributes"]["revenue"]).to eq("0.5")
         end
 
         it "revenue by date" do
@@ -153,8 +153,20 @@ describe "Merchant API" do
           get "/api/v1/merchants/#{merchant.id}/revenue?date=#{date}"
 
           res = JSON.parse(response.body)["data"]
+          require 'pry'; binding.pry
+          expect(res["attributes"]["revenue"]).to eq("0.5")
+        end
 
-          expect(res["revenue"].to_i).to eq(50)
+        it "favorite customer" do
+          merchant = create(:merchant)
+          create(:invoice, merchant: merchant, items_count: 1)
+          invoice_2, invoice_2_1 = create_list(:invoice, 2, merchant: merchant, items_count: 2)
+
+          get "/api/v1/merchants/#{merchant.id}/favorite_customer"
+
+          res = JSON.parse(response.body)["data"]
+
+          expect(res["id"].to_i).to eq(invoice_2.customer.id)
         end
       end
     end

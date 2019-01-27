@@ -7,7 +7,7 @@ class Merchant < ApplicationRecord
   has_many :invoices, through: :invoice_items
 
   def self.most_revenue(quantity = 1)
-    Merchant.joins(:invoice_items, invoices: :transactions)
+    joins(:invoice_items, invoices: :transactions)
     .where(transactions: {result: "success"})
     .select("merchants.*, sum(invoice_items.quantity * invoice_items.unit_price) as total_revenue")
     .order("total_revenue DESC")
@@ -15,11 +15,20 @@ class Merchant < ApplicationRecord
     .limit(quantity)
   end
 
+  def favorite_customer
+    Customer.joins(:transactions, :invoices, invoices: {items: :invoice_items})
+    .select("customers.*", "count(transactions.id) as trans_num")
+    .where(transactions: {result: "success"})
+    .order("trans_num DESC")
+    .group(:id)
+    .limit(1)
+    .first
+  end
+
   def revenue(raw_date = nil)
     result = Item.joins(:invoice_items, invoices: :transactions)
     .where(transactions: {result: "success"})
     .where(merchant_id: self)
-
 
     if raw_date
       date = DateTime.parse(raw_date)

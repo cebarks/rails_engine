@@ -30,9 +30,9 @@ Rails.application.routes.draw do
         get 'find_all', to: 'search#index'
         get 'most_revenue', to: 'revenue#index'
       end
-      
       resources :merchants, only: [:index, :show] do
         get 'revenue', to: 'merchants/revenue#show'
+        get 'favorite_customer', to: 'merchants/favorite#show'
       end
 
       namespace :transactions do

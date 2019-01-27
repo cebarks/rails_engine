@@ -15,6 +15,15 @@ class Merchant < ApplicationRecord
     .limit(quantity)
   end
 
+  def self.most_items(quantity)
+    joins(:invoice_items, invoices: :transactions)
+    .select("merchants.*", "sum(invoice_items.quantity) as items_sold")
+    .where(transactions: {result: "success"})
+    .order("items_sold DESC")
+    .group(:id)
+    .limit(quantity)
+  end
+
   def favorite_customer
     Customer.joins(:transactions, :invoices, invoices: {items: :invoice_items})
     .select("customers.*", "count(transactions.id) as trans_num")

@@ -72,11 +72,11 @@ describe "customer API" do
           @customers = create_list(:customer, 3, created_at: "2019-01-24 12:00:00 UTC", updated_at: "2019-01-24 13:00:00 UTC")
         end
 
-        xit "primary key search" do
+        it "primary key search" do
           get "/api/v1/customers/find_all?id=#{@customers.first.id}"
 
           res = JSON.parse(response.body)["data"]
-          expect(res.first["attributes"]["name"]).to eq(@customers.first.name)
+          expect(res["attributes"]["first_name"]).to eq(@customers.first.first_name)
         end
 
         it "first_name search" do

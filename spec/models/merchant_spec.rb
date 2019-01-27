@@ -16,9 +16,10 @@ RSpec.describe Merchant, type: :model do
 
   describe "Instance Methods" do
     it "#revenue" do
-      merchant = create(:invoice, items_count: 1).merchant
+      date = "1/1/1970"
+      merchant = create(:invoice, items_count: 1, created_at: date).merchant
 
-      expect(merchant.revenue).to eq(50)
+      expect(merchant.revenue(date)).to eq(50)
     end
   end
 end

@@ -9,8 +9,8 @@ class ApplicationSearchController < ApplicationController
       render json: serializer.new(clazz.where("first_name ILIKE '#{search_params(clazz)[search_type]}'").first)
     when "last_name"
       render json: serializer.new(clazz.where("last_name ILIKE '#{search_params(clazz)[search_type]}'").first)
-    when "unit_price"
-      render json: serializer.new(clazz.where(unit_price: search_params(clazz)[search_type].to_f * 100).first)
+    # when "unit_price"
+    #   render json: serializer.new(clazz.where(unit_price: (search_params(clazz)[search_type].to_f * 100).to_i).first)
     else
       result = clazz.where(search_type.to_sym => search_params(clazz)[search_type]).first
       render json: serializer.new(result)
@@ -27,8 +27,8 @@ class ApplicationSearchController < ApplicationController
       render json: serializer.new(clazz.where("first_name ILIKE '#{search_params(clazz)[search_type]}'"))
     when "last_name"
       render json: serializer.new(clazz.where("last_name ILIKE '#{search_params(clazz)[search_type]}'"))
-    when "unit_price"
-      render json: serializer.new(clazz.where(unit_price: search_params(clazz)[search_type].to_f * 100))
+    # when "unit_price"
+      # render json: serializer.new(clazz.where(unit_price: search_params(clazz)[search_type].to_f * 100))
     else
       render json: serializer.new(clazz.where(search_type.to_sym => search_params(clazz)[search_type]))
     end

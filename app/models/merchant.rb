@@ -28,6 +28,7 @@ class Merchant < ApplicationRecord
     Customer.joins(:transactions, :invoices, invoices: {items: :invoice_items})
     .select("customers.*", "count(transactions.id) as trans_num")
     .where(transactions: {result: "success"})
+    .where(items: {merchant_id: self})
     .order("trans_num DESC")
     .group(:id)
     .limit(1)

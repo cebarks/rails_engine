@@ -64,11 +64,11 @@ describe "Merchant API" do
           @merchants = create_list(:merchant, 3, created_at: "2019-01-24 12:00:00 UTC", updated_at: "2019-01-24 13:00:00 UTC")
         end
 
-        xit "primary key search" do
+        it "primary key search" do
           get "/api/v1/merchants/find_all?id=#{@merchants.first.id}"
 
           res = JSON.parse(response.body)["data"]
-          expect(res.first["attributes"]["name"]).to eq(@merchants.first.name)
+          expect(res["attributes"]["name"]).to eq(@merchants.first.name)
         end
 
         it "name search" do
@@ -100,6 +100,75 @@ describe "Merchant API" do
           expect(res.first["id"].to_i).to eq(@merchants.first.id)
           expect(res.second["id"].to_i).to eq(@merchants.second.id)
           expect(res.third["id"].to_i).to eq(@merchants.third.id)
+        end
+      end
+    end
+
+    describe "Business Intelligence" do
+      describe "Multi" do
+        it "most_revenue" do
+          invoice_1 = create(:invoice)
+          invoice_2 = create(:invoice, items_count: 20)
+
+          get "/api/v1/merchants/most_revenue?quantity=2"
+
+          res = JSON.parse(response.body)["data"]
+
+          expect(res.first["id"].to_i).to eq(invoice_2.merchant.id)
+          expect(res.second["id"].to_i).to eq(invoice_1.merchant.id)
+        end
+
+        it "most_items" do
+          invoice_1 = create(:invoice)
+          invoice_2 = create(:invoice, items_count: 2)
+
+          get "/api/v1/merchants/most_items?quantity=2"
+
+          res = JSON.parse(response.body)["data"]
+
+          expect(res.length).to eq(2)
+          expect(res.first["id"].to_i).to eq(invoice_1.merchant.id)
+          expect(res.second["id"].to_i).to eq(invoice_2.merchant.id)
+        end
+      end
+
+
+      describe "Single" do
+        it "revenue" do
+          merchant = create(:merchant)
+          create(:invoice, merchant: merchant, items_count: 1)
+
+          get "/api/v1/merchants/#{merchant.id}/revenue"
+
+          res = JSON.parse(response.body)["data"]
+
+          expect(res["attributes"]["revenue"]).to eq("0.5")
+        end
+
+        it "revenue by date" do
+          date = "2012-03-16"
+
+          merchant = create(:merchant)
+          create(:invoice, merchant: merchant, items_count: 1, created_at: date)
+          create(:invoice, merchant: merchant, items_count: 1, created_at: 1.day.ago)
+
+          get "/api/v1/merchants/#{merchant.id}/revenue?date=#{date}"
+
+          res = JSON.parse(response.body)["data"]
+
+          expect(res["attributes"]["revenue"]).to eq("0.5")
+        end
+
+        it "favorite customer" do
+          merchant = create(:merchant)
+          create(:invoice, merchant: merchant, items_count: 1)
+          invoice_2, invoice_2_1 = create_list(:invoice, 2, merchant: merchant, items_count: 2)
+
+          get "/api/v1/merchants/#{merchant.id}/favorite_customer"
+
+          res = JSON.parse(response.body)["data"]
+
+          expect(res["id"].to_i).to eq(invoice_2.customer.id)
         end
       end
     end

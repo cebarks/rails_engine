@@ -2,7 +2,7 @@ class ApplicationSearchController < ApplicationController
   def show_find_helper(clazz, serializer)
     case search_type = search_params(clazz).keys.first
     when "id"
-      render json: serializer.new(clazz.find(search_params(clazz)[search_type]))
+      render json: serializer.new(clazz.find(params[:id]))
     when "name"
       render json: serializer.new(clazz.where("name ILIKE '#{search_params(clazz)[search_type]}'").first)
     when "first_name"
@@ -20,7 +20,7 @@ class ApplicationSearchController < ApplicationController
   def index_find_helper(clazz, serializer)
     case search_type = search_params(clazz).keys.first
     when "id"
-      render json: serializer.new(clazz.find(search_params(clazz)[:id]))
+      render json: serializer.new(clazz.find(params[:id]))
     when "name"
       render json: serializer.new(clazz.where("name ILIKE '#{search_params(clazz)[search_type]}'"))
     when "first_name"

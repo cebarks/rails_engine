@@ -52,6 +52,7 @@ describe "item API" do
           expect(res["id"].to_i).to eq(@item.id)
         end
       end
+
       describe "Multi-Finders" do
         before(:each) do
           @items = create_list(:item, 3, created_at: "2019-01-24 12:00:00 UTC", updated_at: "2019-01-24 13:00:00 UTC",)
@@ -83,6 +84,29 @@ describe "item API" do
           expect(res.second["id"].to_i).to eq(@items.second.id)
           expect(res.third["id"].to_i).to eq(@items.third.id)
         end
+      end
+    end
+    describe "Business Intelligence" do
+      describe "Multi" do
+        it "most_items" do
+          item_1, item_2, * = create_list(:item, 3)
+          invoice_1 = create(:invoice, items_count: 0)
+          invoice_2 = create(:invoice, items_count: 0)
+          create(:invoice_item, item: item_1, invoice: invoice_1, quantity: 20)
+          create(:invoice_item, item: item_2, invoice: invoice_2, quantity: 15)
+
+          get "/api/v1/items/most_items?quantity=2"
+
+          res = JSON.parse(response.body)["data"]
+
+          expect(res.length).to eq(2)
+          expect(res.first["id"].to_i).to eq(item_1.id)
+          expect(res.second["id"].to_i).to eq(item_2.id)
+        end
+      end
+
+      describe "Single" do
+
       end
     end
   end
